@@ -3,61 +3,62 @@ import re
 import sys
 import os
 
-path_to_res = "re.html"
-path_to_dict = "me.txt"
-path_to_text = "test.txt"
+paths = dict()
 
 
-def main():
-    """Return the pathname of the KOS root directory."""
+def initial(input_list):  # Проверка наличия/отсутствия файлов
+    """Initializing."""
     try:
-        if os.path.exists(path_to_res):
-            raise FileExistsError("Файл с таким именем существует. \
-Перезаписать?")
+        if not os.path.exists(input_list[1]):
+            raise FileNotFoundError("Файла с текстом не существует")
 
-        else:
-            with open(path_to_res, "w", encoding="utf-8") as g:
-                g.write("<!doctype html><html lang='ru'><head><meta charset='UTF-8'>\
-<title>Document</title></head><body>")
+        if not os.path.exists(input_list[2]):
+            raise FileNotFoundError("Файла со словарем не существует")
 
-                if os.path.exists(path_to_dict):
-                    with open(path_to_dict, "r", encoding="utf-8") as d:
-                        words = d.read().split("\n")
-                        tuple(words)
-
-                else:
-                    raise FileNotFoundError("Файла со \
-словарем не существует.")
-
-                if os.path.exists(path_to_text):
-                    with open(path_to_text, "r", encoding="utf-8") as f:
-
-                        #  with open("mes.txt", "r", encoding="utf-8") as f:
-
-                        for line in f:
-                            for word in words:
-                                # line = line.replace(word, "<i><b>" + word + "</i></b>")
-                                line = re.sub(r"\b" + word + r"\b", "<i><b>" +
-                                              word + "</i></b>", line)
-
-                            g.write(line)
-                            g.write("<br>")
-                    g.write("</body></html>")
-
-                else:
-                    raise FileNotFoundError("Файла с текстом \
-не существует.")
-
-    except UnicodeDecodeError:
-        print("Пожалуйста, сохраните все файлы \
-с кодировкой UTF-8")
+        if os.path.exists(input_list[3]):
+            raise FileNotFoundError("Файл с таким именем существует")
 
     except FileNotFoundError:
         print(sys.exc_info()[1])
 
     except FileExistsError:
         print(sys.exc_info()[1])
+    else:
+        paths['path_to_text'] = input_list[1]  # Файл с текстом
+        paths['path_to_dict'] = input_list[2]  # Файл со словарем
+        paths['path_to_res'] = input_list[3]  # Результирующий файл
+
+
+def main():
+    """Main suite."""
+    try:
+        with open(paths['path_to_res'], "w", encoding="utf-8") as g:
+
+            g.write("<!doctype html><html lang='ru'><head><meta charset='UTF-8'>\
+<title>Document</title></head><body>")
+
+            with open(paths['path_to_dict'], "r", encoding="utf-8") as d:
+
+                words = d.read().split("\n")  # Составление
+                tuple(words)                  # кортежа из словаря
+
+                with open(paths['path_to_text'], "r", encoding="utf-8") as f:
+
+                    for line in f:  # Идем по строкам из текста..
+                        for word in words:  # И солвам из словаря.
+                            line = re.sub(r"\b" + word + r"\b", "<i><b>" +  # Выделяем найденные
+                                          word + "</i></b>", line)
+
+                        g.write(line)
+                        g.write("<br>")
+            g.write("</body></html>")
+
+    except UnicodeDecodeError:
+        print("Пожалуйста, сохраните все файлы с кодировкой UTF-8")
 
 
 if __name__ == '__main__':
-    main()
+    initial(sys.argv)
+
+    if paths:  # Если пути к файлам корректны
+        main()
