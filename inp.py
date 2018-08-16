@@ -1,2 +1,4 @@
-a = input('Введи число\n')
-print(a)
+a = set('qwwerty')
+b = 'a'
+if b in a:
+    print(b)

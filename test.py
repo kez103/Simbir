@@ -39,15 +39,15 @@ def main():
 
             with open(paths['path_to_dict'], "r", encoding="utf-8") as d:
 
-                words = d.read().split("\n")  # Составление
-                tuple(words)                  # кортежа из словаря
+                words = frozenset(d.read().split("\n"))  # Множество слов словаря
 
                 with open(paths['path_to_text'], "r", encoding="utf-8") as f:
 
-                    for line in f:  # Идем по строкам из текста..
-                        for word in words:  # И солвам из словаря.
-                            line = re.sub(r"\b" + word + r"\b", "<i><b>" +  # Выделяем найденные
-                                          word + "</i></b>", line)
+                    for line in f:  # Идем по строкам из текста
+                        for word in line.split():  # Идем по словам из строки.
+                            if word in words:
+                                line = re.sub(r"\b" + word + r"\b", "<i><b>" +
+                                    word + "</i></b>", line)  # Оборачивание" слова из словаря
 
                         g.write(line)
                         g.write("<br>")
